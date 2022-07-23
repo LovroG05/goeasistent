@@ -7,7 +7,7 @@ import (
 )
 
 func Timetable(accessToken string, from string, to string) (string, error) {
-	req, err := http.NewRequest("GET", "https://www.easistent.com/m/timetable/events", nil)
+	req, err := http.NewRequest("GET", "https://www.easistent.com/m/timetable/weekly", nil)
 	if err != nil {
 		return "", err
 	}
