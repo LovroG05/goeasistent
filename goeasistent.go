@@ -5,6 +5,8 @@ import (
 
 	"github.com/LovroG05/goeasistent/endpoints"
 	"github.com/LovroG05/goeasistent/objects"
+	gottfobjects "github.com/OpenTimetable/GOTTF/objects"
+	"github.com/OpenTimetable/GOTTF/parsers"
 )
 
 type Goeasistent interface {
@@ -77,4 +79,133 @@ func (i *Instance) GetTimetable(from string, to string) (objects.Timetable, erro
 	}
 
 	return timetable, nil
+}
+
+func ComposeOTTF(timetable objects.Timetable) parsers.Timetable {
+	version := "1.0"
+
+	periods := make(map[string]gottfobjects.Span)
+	var recesses []gottfobjects.Span
+	// Get periods
+	for _, time := range timetable.TimeTable {
+		// TODO change times to UTC to better comply with the OTTF standard
+		var span gottfobjects.Span
+		timestr, _ := json.Marshal(time.Time)
+		err := json.Unmarshal(timestr, &span)
+		if err != nil {
+			return parsers.Timetable{}
+		}
+		if time.Type == "default" {
+			id := time.Name
+			periods[id] = span
+		} else if time.Type == "break" {
+			recesses = append(recesses, span)
+		}
+	}
+
+	cues := gottfobjects.Cues{
+		Periods:  periods,
+		Recesses: recesses,
+	}
+
+	days := make(map[string]gottfobjects.Day)
+
+	for _, day := range timetable.DayTable {
+		var classes map[string][]gottfobjects.Class
+		var events []gottfobjects.Event
+		var dayEvents []gottfobjects.DayEvent
+
+		for _, class := range timetable.SchoolHourEvents {
+			var hosts []string
+			for hid := range class.Teachers {
+				hosts = append(hosts, class.Teachers[hid].Name)
+			}
+
+			var cancelled bool
+			var exam bool
+			var sub bool
+			switch *class.HourSpecialType {
+			case "cancelled":
+				cancelled = true
+			case "exam":
+				exam = true
+			case "substitution":
+				sub = true
+			}
+
+			newClass := gottfobjects.Class{
+				Name:         class.Subject.Name,
+				Abbreviation: class.Subject.Name,
+				Hosts:        hosts,
+				Location:     class.Classroom.Name,
+				Substitution: sub,
+				Examination:  exam,
+				Canceled:     cancelled,
+			}
+
+			period := getPeriod(timetable.TimeTable, class.Time)
+
+			if classes[period] == nil {
+				classes[period] = []gottfobjects.Class{}
+			}
+
+			classes[period] = append(classes[period], newClass)
+
+		}
+
+		for _, event := range timetable.Events {
+			var hosts []string
+			for hid := range event.Teachers {
+				hosts = append(hosts, event.Teachers[hid].Name)
+			}
+
+			events = append(events, gottfobjects.Event{
+				From:     event.Time.From,
+				To:       event.Time.To,
+				Title:    event.Name,
+				Location: event.Location.Name,
+				Hosts:    hosts,
+			})
+		}
+
+		for _, dayEvent := range timetable.AllDayEvents {
+			var hosts []string
+			for hid := range dayEvent.Teachers {
+				hosts = append(hosts, dayEvent.Teachers[hid].Name)
+			}
+
+			dayEvents = append(dayEvents, gottfobjects.DayEvent{
+				Title:    dayEvent.Name,
+				Location: "",
+				Hosts:    hosts,
+			})
+		}
+
+		newDay := gottfobjects.Day{
+			Classes:   classes,
+			Events:    events,
+			DayEvents: dayEvents,
+		}
+
+		date := day.Date
+
+		days[date] = newDay
+	}
+
+	ottfTimetable := parsers.Timetable{
+		Version: version,
+		Cues:    cues,
+		Days:    days,
+	}
+
+	return ottfTimetable
+}
+
+func getPeriod(timetableItems []objects.TimeTableItem, time objects.TimeBind) string {
+	for _, t := range timetableItems {
+		if t.ID == time.FromID || t.ID == time.ToID {
+			return t.Name
+		}
+	}
+	return ""
 }

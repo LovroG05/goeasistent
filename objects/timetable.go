@@ -11,6 +11,8 @@ type Timetable struct {
 		EventType int    `json:"event_type"`
 		ID        int    `json:"id"`
 		Location  struct {
+			Name      string `json:"name"`
+			ShortName string `json:"short_name"`
 		} `json:"location"`
 		Name     string   `json:"name"`
 		Teachers []IDName `json:"teachers"`
@@ -26,21 +28,16 @@ type Timetable struct {
 		HourSpecialType *string  `json:"hour_special_type"`
 		Subject         IDName   `json:"subject"`
 		Teachers        []IDName `json:"teachers"`
-		Time            struct {
-			Date   string `json:"date"`
-			FromID int    `json:"from_id"`
-			ToID   int    `json:"to_id"`
-		} `json:"time"`
+		Time            TimeBind `json:"time"`
 		Videokonferenca struct {
 		} `json:"videokonferenca"`
 	} `json:"school_hour_events"`
-	TimeTable []struct {
-		ID        int    `json:"id"`
-		Name      string `json:"name"`
-		NameShort string `json:"name_short"`
-		Time      Time   `json:"time"`
-		Type      string `json:"type"`
-	} `json:"time_table"`
+	TimeTable    []TimeTableItem `json:"time_table"`
+	AllDayEvents []struct {
+		Date     string   `json:"date"`
+		Name     string   `json:"name"`
+		Teachers []IDName `json:"teachers"`
+	}
 }
 type IDName struct {
 	ID   string `json:"id"`
@@ -49,4 +46,17 @@ type IDName struct {
 type Time struct {
 	From string `json:"from"`
 	To   string `json:"to"`
+}
+
+type TimeTableItem struct {
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	NameShort string `json:"name_short"`
+	Time      Time   `json:"time"`
+	Type      string `json:"type"`
+}
+type TimeBind struct {
+	Date   string `json:"date"`
+	FromID int    `json:"from_id"`
+	ToID   int    `json:"to_id"`
 }
