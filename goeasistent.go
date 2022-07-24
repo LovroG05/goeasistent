@@ -5,6 +5,7 @@ import (
 
 	"github.com/LovroG05/goeasistent/endpoints"
 	"github.com/LovroG05/goeasistent/objects"
+	gottf "github.com/OpenTimetable/GOTTF"
 	gottfobjects "github.com/OpenTimetable/GOTTF/objects"
 	"github.com/OpenTimetable/GOTTF/parsers"
 )
@@ -208,4 +209,13 @@ func getPeriod(timetableItems []objects.TimeTableItem, time objects.TimeBind) st
 		}
 	}
 	return ""
+}
+
+func ComposeOTTFJsonString(timetable objects.Timetable) string {
+	ottfTimetable := ComposeOTTF(timetable)
+	ottfJson, err := gottf.ComposeTimetable(ottfTimetable, "1.0")
+	if err != nil {
+		return ""
+	}
+	return ottfJson
 }
