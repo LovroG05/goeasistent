@@ -2,6 +2,7 @@ package goeasistent
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/LovroG05/goeasistent/endpoints"
 	"github.com/LovroG05/goeasistent/objects"
@@ -194,7 +195,12 @@ func ComposeOTTF(timetable objects.Timetable) parsers.Timetable {
 	}
 
 	ottfTimetable := parsers.Timetable{
-		Version: version,
+		Metadata: gottfobjects.Metadata{
+			Version: version,
+			Author: "eAsistent via goeasistent by LovroG05",
+			Timezone: "UTC+2",
+			Timestamp: time.Now().Unix(),
+		},
 		Cues:    cues,
 		Days:    days,
 	}

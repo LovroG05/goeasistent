@@ -1,2 +1,6 @@
 github.com/OpenTimetable/GOTTF v0.0.0-20220722165414-fb157e9e49fc h1:N7pzzPoS5e6kRe0raDUxRXmU9LZoml7cIaiW/lRzolo=
 github.com/OpenTimetable/GOTTF v0.0.0-20220722165414-fb157e9e49fc/go.mod h1:7V5ChNSj/WQT1FnU/PBm3YvyW6klZ8VLUfnGGMDj3ig=
+github.com/OpenTimetable/GOTTF v1.0.0 h1:j8YUD2qkEmjJtwdllteSBc6elwcIdSu3YmBGWYqWMNI=
+github.com/OpenTimetable/GOTTF v1.0.0/go.mod h1:7V5ChNSj/WQT1FnU/PBm3YvyW6klZ8VLUfnGGMDj3ig=
+github.com/OpenTimetable/GOTTF v1.0.1 h1:tGqFr6CrZu/Bz/IsVh77c+VPJyqFHzTw0N406XC5Efc=
+github.com/OpenTimetable/GOTTF v1.0.1/go.mod h1:7V5ChNSj/WQT1FnU/PBm3YvyW6klZ8VLUfnGGMDj3ig=
