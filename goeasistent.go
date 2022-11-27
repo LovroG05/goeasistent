@@ -16,6 +16,7 @@ type Goeasistent interface {
 	RefreshToken(sessionToken string) error
 	GetChild() (objects.ChildData, error)
 	GetTimetable(from string, to string) (objects.Timetable, error)
+	GetGrades()
 }
 
 type Instance struct {
@@ -81,6 +82,22 @@ func (i *Instance) GetTimetable(from string, to string) (objects.Timetable, erro
 	}
 
 	return timetable, nil
+}
+
+func (i *Instance) GetGrades() (objects.Grades, error) {
+	gradesJson, err := endpoints.Grades(i.UserData.Tokens.AccessToken.Token)
+	if err != nil {
+		return objects.Grades{}, err
+	}
+
+	var grades objects.Grades
+
+	err = json.Unmarshal([]byte(gradesJson), &grades)
+	if err != nil {
+		return objects.Grades{}, err
+	}
+
+	return grades, nil
 }
 
 func ComposeOTTF(timetable objects.Timetable) parsers.Timetable {
@@ -196,13 +213,13 @@ func ComposeOTTF(timetable objects.Timetable) parsers.Timetable {
 
 	ottfTimetable := parsers.Timetable{
 		Metadata: gottfobjects.Metadata{
-			Version: version,
-			Author: "eAsistent via goeasistent by LovroG05",
-			Timezone: "UTC+2",
-			Timestamp: time.Now().Unix(),
+			Version:   version,
+			Author:    "eAsistent via goeasistent by LovroG05",
+			Timezone:  "UTC+2",
+			Timestamp: uint64(time.Now().Unix()),
 		},
-		Cues:    cues,
-		Days:    days,
+		Cues: cues,
+		Days: days,
 	}
 
 	return ottfTimetable
