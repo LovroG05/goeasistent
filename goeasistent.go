@@ -85,7 +85,7 @@ func (i *Instance) GetTimetable(from string, to string) (objects.Timetable, erro
 }
 
 func (i *Instance) GetGrades() (objects.Grades, error) {
-	gradesJson, err := endpoints.Grades(i.UserData.Tokens.AccessToken.Token)
+	gradesJson, err := endpoints.Grades(i.UserData.Tokens.AccessToken.Token, i.UserData.User.ID)
 	if err != nil {
 		return objects.Grades{}, err
 	}

@@ -6,12 +6,13 @@ import (
 	"net/http"
 )
 
-func Grades(accessToken string) (string, error) {
+func Grades(accessToken string, childId int) (string, error) {
 	req, err := http.NewRequest("GET", "https://www.easistent.com/m/grades", nil)
 	if err != nil {
 		return "", err
 	}
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("x-child-id", string(childId))
 	req.Header.Set("X-App-Name", "child")
 	req.Header.Set("x-client-platform", "android")
 	req.Header.Set("x-client-version", "11101")
